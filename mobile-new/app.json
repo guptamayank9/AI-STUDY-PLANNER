@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "AI Study Planner",
+    "slug": "ai-study-planner",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#1E3A5F"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourname.aistudyplanner"
+    },
+    "android": {
+      "package": "com.yourname.aistudyplanner"
+    }
+  }
+}
