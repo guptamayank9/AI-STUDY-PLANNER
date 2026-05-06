@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f0f4f8;
+  color: #1a202c;
+}
+
+:root {
+  --primary:   #4A90D9;
+  --primary-dark: #1E3A5F;
+  --success:   #48bb78;
+  --warning:   #ed8936;
+  --danger:    #fc8181;
+  --bg:        #f0f4f8;
+  --card:      #ffffff;
+  --border:    #e2e8f0;
+  --text:      #1a202c;
+  --text-muted:#718096;
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border: 1px solid var(--border);
+}
+
+/* Buttons */
+.btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: #3578c5; }
+.btn-outline  { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+.btn-outline:hover { background: var(--primary); color: #fff; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Inputs */
+.input {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.2s;
+}
+.input:focus { border-color: var(--primary); }
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.badge-high    { background: #fed7d7; color: #c53030; }
+.badge-medium  { background: #feebc8; color: #c05621; }
+.badge-low     { background: #c6f6d5; color: #276749; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }

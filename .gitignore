@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.Python
+env/
+venv/
+.env/
+
+# Environment files - IMPORTANT: never upload these
+.env
+*.env
+.env.local
+.env.production
+
+# Build outputs
+build/
+dist/
+.next/
+
+# Expo
+.expo/
+mobile/.expo/
+mobile-new/.expo/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Python
+*.egg-info/
+.pytest_cache/
+ml-service/data/
+
+# MongoDB
+*.mongodb
+
+# Redis dump
+dump.rdb
