@@ -1,27 +1,23 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL
-    ? `${process.env.REACT_APP_API_URL}/api`
-    : "http://localhost:5000/api",
+  baseURL: "http://localhost:5000/api",
   timeout: 15000,
 });
 
-// Attach JWT token to every request
+// Attach token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 
-// Handle 401 globally
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
+    console.error("API Error:", err.response?.status, err.config?.url);
     return Promise.reject(err);
   }
 );

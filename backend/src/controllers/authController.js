@@ -19,7 +19,18 @@ exports.register = async (req, res) => {
     res.status(201).json({
       success: true,
       token: generateToken(user._id),
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        subjects: user.subjects,          // ← ADDED
+        examDate: user.examDate,          // ← ADDED
+        studyHoursPerDay: user.studyHoursPerDay, // ← ADDED
+        streak: user.streak,
+        totalPoints: user.totalPoints,
+        preferences: user.preferences,   // ← ADDED
+      },
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -39,7 +50,18 @@ exports.login = async (req, res) => {
     res.json({
       success: true,
       token: generateToken(user._id),
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, streak: user.streak },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        subjects: user.subjects,          // ← ADDED
+        examDate: user.examDate,          // ← ADDED
+        studyHoursPerDay: user.studyHoursPerDay, // ← ADDED
+        streak: user.streak,
+        totalPoints: user.totalPoints,
+        preferences: user.preferences,   // ← ADDED
+      },
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

@@ -28,33 +28,55 @@ export const loadUser = createAsyncThunk("auth/loadUser", async (_, { rejectWith
     const { data } = await api.get("/auth/me");
     return { user: data.user, token };
   } catch (err) {
-    localStorage.removeItem("token");
-    return rejectWithValue("Session expired");
+    return rejectWithValue("Could not load user");
   }
 });
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: { user: null, token: localStorage.getItem("token"), loading: false, error: null },
+  initialState: {
+    user:    null,
+    token:   localStorage.getItem("token") || null,
+    loading: false,
+    error:   null,
+  },
   reducers: {
     logout(state) {
-      state.user = null;
+      state.user  = null;
       state.token = null;
       localStorage.removeItem("token");
+    },
+    // ── Update user in store without API call ──────────────────────────
+    updateUser(state, action) {
+      state.user = { ...state.user, ...action.payload };
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(login.pending,    (s) => { s.loading = true; s.error = null; })
-      .addCase(login.fulfilled,  (s, a) => { s.loading = false; s.user = a.payload.user; s.token = a.payload.token; })
+      .addCase(login.fulfilled,  (s, a) => {
+        s.loading = false;
+        s.token   = a.payload.token;
+        s.user    = a.payload.user;
+      })
       .addCase(login.rejected,   (s, a) => { s.loading = false; s.error = a.payload; })
-      .addCase(register.pending,   (s) => { s.loading = true; })
-      .addCase(register.fulfilled, (s, a) => { s.loading = false; s.user = a.payload.user; s.token = a.payload.token; })
+
+      .addCase(register.pending,   (s) => { s.loading = true; s.error = null; })
+      .addCase(register.fulfilled, (s, a) => {
+        s.loading = false;
+        s.token   = a.payload.token;
+        s.user    = a.payload.user;
+      })
       .addCase(register.rejected,  (s, a) => { s.loading = false; s.error = a.payload; })
-      .addCase(loadUser.fulfilled, (s, a) => { s.user = a.payload.user; s.token = a.payload.token; })
-      .addCase(loadUser.rejected,  (s) => { s.user = null; s.token = null; });
+
+      .addCase(loadUser.fulfilled, (s, a) => {
+        s.user  = a.payload.user;
+        s.token = a.payload.token;
+      })
+      // ⚠️ loadUser reject pe KUCH MAT KARO — logout mat karo
+      .addCase(loadUser.rejected, () => {});
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, updateUser } = authSlice.actions;
 export default authSlice.reducer;

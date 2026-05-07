@@ -1,39 +1,54 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { loadUser } from "../store/authSlice";
+import { logout } from "../store/authSlice";
 import api from "../services/api";
 import toast from "react-hot-toast";
-import { FiAward, FiZap } from "react-icons/fi";
+import { FiZap, FiAward } from "react-icons/fi";
 
-const SUBJECTS = ["Mathematics", "Physics", "Chemistry", "Biology", "DSA", "DBMS", "OS", "CN"];
+const ALL_SUBJECTS = [
+  "Mathematics", "Physics", "Chemistry", "Biology",
+  "DSA", "DBMS", "OS", "CN",
+];
 
 export default function ProfilePage() {
   const dispatch = useDispatch();
   const { user } = useSelector((s) => s.auth);
+
   const [form, setForm] = useState({
-    name: user?.name || "",
-    subjects: user?.subjects || [],
-    examDate: user?.examDate?.slice(0, 10) || "",
+    name:             user?.name             || "",
+    subjects:         user?.subjects         || [],
+    examDate:         user?.examDate?.slice(0, 10) || "",
     studyHoursPerDay: user?.studyHoursPerDay || 4,
-    preferences: user?.preferences || {},
+    preferences: {
+      studyStartTime: user?.preferences?.studyStartTime || "09:00",
+      studyEndTime:   user?.preferences?.studyEndTime   || "21:00",
+    },
   });
+
   const [saving, setSaving] = useState(false);
 
-  const toggleSubject = (s) => {
+  const toggleSubject = (s) =>
     setForm((f) => ({
       ...f,
-      subjects: f.subjects.includes(s) ? f.subjects.filter((x) => x !== s) : [...f.subjects, s],
+      subjects: f.subjects.includes(s)
+        ? f.subjects.filter((x) => x !== s)
+        : [...f.subjects, s],
     }));
-  };
 
+  // ── Save without calling loadUser ─────────────────────────────────────
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.put("/user/profile", form);
-      await dispatch(loadUser());
-      toast.success("Profile updated!");
-    } catch {
-      toast.error("Update failed");
+      const { data } = await api.put("/user/profile", form);
+      // Update Redux store manually — no loadUser call
+      dispatch({
+        type: "auth/updateUser",
+        payload: data.user,
+      });
+      toast.success("Profile updated successfully! ✅");
+    } catch (err) {
+      console.error("Profile save error:", err);
+      toast.error("Update failed. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -66,53 +81,110 @@ export default function ProfilePage() {
       <div className="card">
         <h2 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "1.2rem" }}>Edit Profile</h2>
 
+        {/* Name */}
         <div style={{ marginBottom: "1rem" }}>
-          <label style={{ display: "block", marginBottom: 5, fontSize: "0.85rem", fontWeight: 500 }}>Name</label>
-          <input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <label style={{ display: "block", marginBottom: 5, fontSize: "0.85rem", fontWeight: 500 }}>
+            Name
+          </label>
+          <input
+            className="input"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
         </div>
 
+        {/* Subjects */}
         <div style={{ marginBottom: "1rem" }}>
-          <label style={{ display: "block", marginBottom: 8, fontSize: "0.85rem", fontWeight: 500 }}>Subjects</label>
+          <label style={{ display: "block", marginBottom: 8, fontSize: "0.85rem", fontWeight: 500 }}>
+            Subjects
+          </label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {SUBJECTS.map((s) => (
-              <button key={s} type="button" onClick={() => toggleSubject(s)} style={{
-                padding: "0.35rem 0.9rem", borderRadius: 20, border: "1px solid",
-                borderColor: form.subjects.includes(s) ? "#4A90D9" : "#e2e8f0",
-                background:  form.subjects.includes(s) ? "#4A90D9" : "#fff",
-                color:       form.subjects.includes(s) ? "#fff"    : "#555",
-                cursor: "pointer", fontSize: "0.82rem", fontWeight: 500
-              }}>{s}</button>
+            {ALL_SUBJECTS.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => toggleSubject(s)}
+                style={{
+                  padding: "0.35rem 0.9rem",
+                  borderRadius: 20,
+                  border: "1px solid",
+                  borderColor: form.subjects.includes(s) ? "#4A90D9" : "#e2e8f0",
+                  background:  form.subjects.includes(s) ? "#4A90D9" : "#fff",
+                  color:       form.subjects.includes(s) ? "#fff"    : "#555",
+                  cursor: "pointer",
+                  fontSize: "0.82rem",
+                  fontWeight: 500,
+                }}
+              >
+                {s}
+              </button>
             ))}
           </div>
         </div>
 
+        {/* Exam Date + Study Hours */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
           <div>
-            <label style={{ display: "block", marginBottom: 5, fontSize: "0.85rem", fontWeight: 500 }}>Exam Date</label>
-            <input className="input" type="date" value={form.examDate}
-              onChange={(e) => setForm({ ...form, examDate: e.target.value })} />
+            <label style={{ display: "block", marginBottom: 5, fontSize: "0.85rem", fontWeight: 500 }}>
+              Exam Date
+            </label>
+            <input
+              className="input"
+              type="date"
+              value={form.examDate}
+              onChange={(e) => setForm({ ...form, examDate: e.target.value })}
+            />
           </div>
           <div>
-            <label style={{ display: "block", marginBottom: 5, fontSize: "0.85rem", fontWeight: 500 }}>Study Hours/Day</label>
-            <input className="input" type="number" min={1} max={12} value={form.studyHoursPerDay}
-              onChange={(e) => setForm({ ...form, studyHoursPerDay: Number(e.target.value) })} />
+            <label style={{ display: "block", marginBottom: 5, fontSize: "0.85rem", fontWeight: 500 }}>
+              Study Hours/Day
+            </label>
+            <input
+              className="input"
+              type="number"
+              min={1}
+              max={12}
+              value={form.studyHoursPerDay}
+              onChange={(e) => setForm({ ...form, studyHoursPerDay: Number(e.target.value) })}
+            />
           </div>
         </div>
 
+        {/* Study Start + End Time */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
           <div>
-            <label style={{ display: "block", marginBottom: 5, fontSize: "0.85rem", fontWeight: 500 }}>Study Start Time</label>
-            <input className="input" type="time" value={form.preferences.studyStartTime || "09:00"}
-              onChange={(e) => setForm({ ...form, preferences: { ...form.preferences, studyStartTime: e.target.value } })} />
+            <label style={{ display: "block", marginBottom: 5, fontSize: "0.85rem", fontWeight: 500 }}>
+              Study Start Time
+            </label>
+            <input
+              className="input"
+              type="time"
+              value={form.preferences.studyStartTime}
+              onChange={(e) =>
+                setForm({ ...form, preferences: { ...form.preferences, studyStartTime: e.target.value } })
+              }
+            />
           </div>
           <div>
-            <label style={{ display: "block", marginBottom: 5, fontSize: "0.85rem", fontWeight: 500 }}>Study End Time</label>
-            <input className="input" type="time" value={form.preferences.studyEndTime || "21:00"}
-              onChange={(e) => setForm({ ...form, preferences: { ...form.preferences, studyEndTime: e.target.value } })} />
+            <label style={{ display: "block", marginBottom: 5, fontSize: "0.85rem", fontWeight: 500 }}>
+              Study End Time
+            </label>
+            <input
+              className="input"
+              type="time"
+              value={form.preferences.studyEndTime}
+              onChange={(e) =>
+                setForm({ ...form, preferences: { ...form.preferences, studyEndTime: e.target.value } })
+              }
+            />
           </div>
         </div>
 
-        <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+        <button
+          className="btn btn-primary"
+          onClick={handleSave}
+          disabled={saving}
+        >
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
