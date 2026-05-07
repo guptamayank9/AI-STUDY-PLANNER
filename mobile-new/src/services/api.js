@@ -8,7 +8,7 @@ export const getToken = () => authToken;
 export const clearToken = () => { authToken = null; };
 
 const api = axios.create({
-  baseURL: "http://10.230.23.217:5000/api",
+  baseURL: "http://10.83.169.217:5000/api",
   timeout: 15000,
 });
 
